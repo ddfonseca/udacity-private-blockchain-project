@@ -59,9 +59,14 @@ class Blockchain {
                 }
                 block.time = this._getCurrentTimeStamp()
                 block.hash = SHA256(JSON.stringify(block)).toString()
-                self.chain.push(block)
-                self.height++
-                resolve(block)
+                const errors = await this.validateChain()
+                if (errors.length === 0) {
+                    self.chain.push(block)
+                    self.height++
+                    resolve(block)
+                } else {
+                    reject(errors)
+                }
                 // reject("Genesis block wasn't created.")
             } catch (err) {
                 reject(err)
