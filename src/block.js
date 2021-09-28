@@ -25,15 +25,18 @@ class Block {
     validate() {
         let self = this
         return new Promise((resolve, reject) => {
-            const originalHash = self.hash
-            self.hash = null
-            const currentHash = SHA256(JSON.stringify(self)).toString()
-            if (currentHash === originalHash) {
-                self.hash = currentHash
-                resolve(originalHash === self.hash)
-            } else {
-                self.hash = originalHash
-                reject('Block has changed!')
+            try {
+                const isvalidBlock =
+                    self.hash ===
+                    SHA256(
+                        JSON.stringify({
+                            ...self,
+                            hash: null
+                        })
+                    ).toString()
+                resolve(isvalidBlock)
+            } catch (err) {
+                reject(err)
             }
         })
     }

@@ -142,9 +142,9 @@ class Blockchain {
         let self = this
         return new Promise((resolve, reject) => {
             try {
-                const block = self.chain.filter((block) => block.hash === hash)
+                const block = self.chain.find((block) => block.hash === hash)
                 if (block) {
-                    resolve(block[0])
+                    resolve(block)
                 }
             } catch (err) {
                 reject(err)
@@ -160,7 +160,7 @@ class Blockchain {
     getBlockByHeight(height) {
         let self = this
         return new Promise((resolve, reject) => {
-            let block = self.chain.filter((p) => p.height === height)[0]
+            let block = self.chain.find((p) => p.height === height)
             if (block) {
                 resolve(block)
             } else {
@@ -177,13 +177,14 @@ class Blockchain {
      */
     getStarsByWalletAddress(address) {
         let self = this
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             try {
-                let stars = [
-                    ...self.chain
-                        .filter((block) => block.getBData.owner === address)
-                        .map((block) => block.getBData.star)
-                ]
+                let blocksData = await Promise.all(
+                    self.chain.map((block) => block.getBData)
+                )
+                let stars = blocksData.filter(
+                    (block) => block.owner === address
+                )
                 resolve(stars)
             } catch (err) {
                 reject(err)
